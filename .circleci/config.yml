@@ -30,4 +30,4 @@ workflows:
       - deploy:
           filters:
             branches:
-              ignore: main
+              only: /^pull\/.*/
