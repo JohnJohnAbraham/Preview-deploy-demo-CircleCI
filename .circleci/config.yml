@@ -1,28 +1,19 @@
 version: 2.1
 
-executors:
-  node-executor:
-    docker:
-      - image: cimg/node:18.17.0
-
 jobs:
   deploy:
-    executor: node-executor
+    docker:
+      - image: cimg/node:18.16.0
     steps:
       - checkout
-      - run:
-          name: Install dependencies
-          command: npm install
-      - run:
-          name: Build app
-          command: npm run build
+      - run: npm install
+      - run: npm run build
       - run:
           name: Install Vercel CLI
           command: npm install -g vercel
       - run:
           name: Deploy to Vercel
-          command: |
-            vercel --token=$VERCEL_TOKEN --prod --confirm
+          command: vercel --token $VERCEL_TOKEN --prod=false --confirm
 
 workflows:
   deploy_on_pr:
@@ -30,4 +21,11 @@ workflows:
       - deploy:
           filters:
             branches:
-              only: /^pull\/.*/
+              ignore: /.*/
+    triggers:
+      - github:
+          event: pull_request
+          action: opened
+      - github:
+          event: pull_request
+          action: synchronize
